@@ -149,19 +149,18 @@ export default function HomePage() {
         <Reveal className="relative mx-auto max-w-6xl px-4 pb-20 pt-8 sm:pt-10 md:px-8 md:pb-24 md:pt-12 lg:pt-16">
           <div className="max-w-2xl">
             <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-paper/25 bg-ink/30 px-3 py-1 font-mono text-xs uppercase tracking-[0.18em] text-paper/90 backdrop-blur-sm">
-              <MapIcon className="h-3.5 w-3.5" /> Research Track 01 · Bluewater Basin · Environmental Science
+              <MapIcon className="h-3.5 w-3.5" /> Research Track 01 · Bluewater Basin · 
             </p>
             <h1 className="text-4xl font-medium leading-tight tracking-tight text-paper md:text-6xl">
-              Learn Research
+              Master Scientific Research
               <br />
-              Like a <span className="text-basin-300">Scientist.</span>
+              Through <span className="text-basin-300"> Real Missions.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-paper/80">
-              A free interactive learning platform that takes complete
-              beginners from zero knowledge to publishing real research,
-              using statistics, GIS, machine learning, AI, and scientific
-              modelling. Bluewater Basin is our first research track, with
-              more fields on the way.
+              Follow the first mission Bluewater Basin expedition to learn scientific thinking, statistics, 
+              GIS, Python, R, machine learning, hydrology, hydrogeology, remote sensing and AI through one 
+              connected research project from field observations to scientific communication. 
+              Other missions would follow.
             </p>
             <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <HeroCta />
