@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+@layer base {
+  :root {
+    --font-display: "Georgia", "Times New Roman", serif;
+    --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", "Fira Code", "Courier New", monospace;
+  }
+
+  html {
+    /* freeCodeCamp-style baseline: bigger, calmer, easier to scan */
+    font-size: 18px;
+  }
+
+  body {
+    @apply bg-paper text-ink antialiased;
+    font-family: var(--font-body);
+    line-height: 1.7;
+    letter-spacing: normal;
+    /* Kill any forced hyphenation / justified-text artifacts that can
+       make paragraphs look like they're breaking words apart mid-line. */
+    hyphens: none;
+    -webkit-hyphens: none;
+    -ms-hyphens: none;
+    text-align: left;
+    text-wrap: pretty;
+  }
+  html.dark body {
+    @apply bg-ink text-paper;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    hyphens: none;
+    line-height: 1.25;
+  }
+
+  p {
+    font-size: 1.0625rem; /* ~19px, freeCodeCamp-scale body copy */
+    hyphens: none;
+  }
+
+  code, pre {
+    hyphens: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme("colors.basin.500");
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: theme("colors.signal.400");
+    color: theme("colors.ink.DEFAULT");
+  }
+}
+
+@layer utilities {
+  .chart-grid {
+    background-image:
+      linear-gradient(currentColor 1px, transparent 1px),
+      linear-gradient(90deg, currentColor 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .type-eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.18em] text-basin-500;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
