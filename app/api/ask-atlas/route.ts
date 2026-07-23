@@ -1,64 +1,88 @@
+import { GoogleGenAI } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
 
-const SYSTEM_PROMPT = `You are Ask Atlas, the in-context research assistant embedded in Research Atlas,
-an educational platform that teaches statistics, GIS, and machine learning through one
-continuous fictional case study: the Bluewater Basin watershed.
+const SYSTEM_PROMPT = `
+You are Ask Atlas, the AI research tutor built into Research Atlas.
 
-Rules:
-- Ground every explanation in Bluewater Basin where possible (rain gauges, groundwater
-  wells, streamflow, land use) rather than generic examples.
-- Assume the learner has never programmed and may have no math background beyond
-  arithmetic unless they show otherwise.
-- Prefer plain language first, then introduce precise terminology.
-- Keep replies under 120 words unless asked to elaborate.
-- Never invent specific numeric results for real-world locations; Bluewater Basin data
-  is synthetic and can be used freely.`;
+Research Atlas is an interactive learning platform that teaches scientific thinking through one continuous fictional environmental study called Bluewater Basin.
+
+Your role is to teach—not simply answer questions.
+
+Always:
+
+• Explain concepts clearly using beginner-friendly language.
+• Use Bluewater Basin examples whenever possible.
+• Assume the learner has little or no programming experience.
+• Explain mathematical symbols one at a time.
+• Break difficult concepts into simple steps.
+• Encourage scientific thinking instead of giving direct answers.
+• Use headings and bullet points where appropriate.
+• If explaining Python or R, provide clear runnable examples.
+• If discussing GIS, hydrology, hydrogeology, statistics or machine learning, relate explanations to Bluewater Basin.
+
+Keep answers concise by default, but provide more detail whenever the learner requests it.
+`;
 
 export async function POST(req: NextRequest) {
-  const { prompt } = await req.json();
-
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json(
-      { reply: null, error: "ANTHROPIC_API_KEY not configured" },
-      { status: 501 }
-    );
-  }
-
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 400,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    const { prompt } = await req.json();
 
-    if (!response.ok) {
+    if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
-        { reply: null, error: `Anthropic API error ${response.status}` },
-        { status: 502 }
+        {
+          reply: null,
+          error: "Prompt is required.",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
-    const data = await response.json();
-    const text = data.content
-      ?.filter((block: { type: string }) => block.type === "text")
-      .map((block: { text: string }) => block.text)
-      .join("\n");
+    const apiKey = process.env.GEMINI_API_KEY;
 
-    return NextResponse.json({ reply: text ?? "I couldn't form a reply — try rephrasing." });
-  } catch {
+    if (!apiKey) {
+      return NextResponse.json(
+        {
+          reply: null,
+          error: "GEMINI_API_KEY not configured.",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    const ai = new GoogleGenAI({
+      apiKey,
+    });
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `${SYSTEM_PROMPT}
+
+User Question:
+${prompt}`,
+    });
+
+    const reply =
+      response.text ??
+      "I'm sorry, I couldn't generate a response. Please try asking your question differently.";
+
+    return NextResponse.json({
+      reply,
+    });
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+
     return NextResponse.json(
-      { reply: null, error: "Network error calling Anthropic API" },
-      { status: 502 }
+      {
+        reply: null,
+        error: "Failed to communicate with Gemini.",
+      },
+      {
+        status: 502,
+      }
     );
   }
 }
