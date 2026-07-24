@@ -7,10 +7,12 @@ import { cn } from "@/lib/utils/cn";
 import { answerAskAtlas } from "@/lib/ask-atlas";
 
 const suggestedPrompts = [
-  "Explain this simply",
-  "Give another example",
-  "Quiz me",
-  "Summarize this lesson",
+  "What is a table?",
+  "Explain machine learning simply",
+  "What is GIS?",
+  "How do scientists clean data?",
+  "Help me solve a research problem",
+  "Quiz me on this mission",
 ];
 
 interface Message {
@@ -25,18 +27,22 @@ export function AskAtlas() {
     {
       role: "atlas",
       content:
-        "I'm Ask Atlas. I can explain any concept on this page more simply, quiz you, or connect it back to an earlier mission. What would help?",
+        "👋 Welcome to Ask Atlas! I'm your AI research tutor. I can explain concepts, answer general questions, teach statistics, mathematics, GIS, Python, R, machine learning, scientific writing, environmental science, and guide you through every Research Atlas mission. What would you like to learn today?",
     },
   ]);
   const [pending, setPending] = useState(false);
 
   async function send(text: string) {
     if (!text.trim() || pending) return;
+
     setMessages((m) => [...m, { role: "user", content: text }]);
     setInput("");
     setPending(true);
+
     const reply = await answerAskAtlas(text);
+
     setMessages((m) => [...m, { role: "atlas", content: reply }]);
+
     setPending(false);
   }
 
@@ -60,21 +66,58 @@ export function AskAtlas() {
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.98 }}
-            transition={{ duration: 0.18 }}
+            transition={{ duration: 0.2 }}
             role="dialog"
             aria-label="Ask Atlas assistant"
-            className="fixed bottom-6 right-6 z-50 flex h-[520px] w-[360px] max-w-[90vw] flex-col overflow-hidden rounded-2xl border border-basin-500/20 bg-paper shadow-2xl dark:bg-ink-800"
+            className="fixed bottom-6 right-6 z-50 flex h-[560px] w-[380px] max-w-[92vw] flex-col overflow-hidden rounded-2xl border border-basin-500/20 bg-paper shadow-2xl dark:bg-ink-800"
           >
+            {/* Header */}
             <div className="flex items-center justify-between border-b border-basin-500/15 bg-basin-500 px-4 py-3 text-paper">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-signal-400" />
-                <span className="font-medium">Ask Atlas</span>
+                <div>
+                  <p className="font-semibold">Ask Atlas</p>
+                  <p className="text-xs opacity-80">
+                    Your AI Research Tutor
+                  </p>
+                </div>
               </div>
-              <button onClick={() => setOpen(false)} aria-label="Close">
+
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Close"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
+            {/* Quick Topics */}
+            <div className="border-b border-basin-500/10 px-4 py-2">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-basin-500">
+                Explore Topics
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "Statistics",
+                  "GIS",
+                  "Machine Learning",
+                  "Python",
+                  "Research",
+                  "Bluewater Basin",
+                ].map((topic) => (
+                  <button
+                    key={topic}
+                    onClick={() => setInput(`Explain ${topic}`)}
+                    className="rounded-full border border-basin-500/20 px-2.5 py-1 text-xs transition hover:bg-basin-500/10"
+                  >
+                    {topic}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Chat */}
             <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
               {messages.map((m, i) => (
                 <div
@@ -89,15 +132,18 @@ export function AskAtlas() {
                   {m.content}
                 </div>
               ))}
+
               {pending && (
-                <div className="max-w-[85%] rounded-xl bg-basin-500/10 px-3 py-2 text-sm text-ink/50 dark:text-paper/50">
-                  Thinking through the basin data…
+                <div className="max-w-[85%] rounded-xl bg-basin-500/10 px-3 py-2 text-sm text-ink/60 dark:text-paper/60">
+                  🤖 Atlas AI is thinking...
                 </div>
               )}
             </div>
 
+            {/* Footer */}
             <div className="border-t border-basin-500/15 p-3">
-              <div className="mb-2 flex flex-wrap gap-1.5">
+
+              <div className="mb-3 flex flex-wrap gap-2">
                 {suggestedPrompts.map((prompt) => (
                   <button
                     key={prompt}
@@ -108,6 +154,7 @@ export function AskAtlas() {
                   </button>
                 ))}
               </div>
+
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -118,9 +165,10 @@ export function AskAtlas() {
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about this lesson…"
-                  className="flex-1 rounded-full border border-basin-500/25 bg-transparent px-3 py-2 text-sm outline-none focus:border-basin-500"
+                  placeholder="Ask anything about research, science, AI, programming or this mission..."
+                  className="flex-1 rounded-full border border-basin-500/25 bg-transparent px-4 py-2 text-sm outline-none focus:border-basin-500"
                 />
+
                 <button
                   type="submit"
                   aria-label="Send"
