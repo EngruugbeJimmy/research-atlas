@@ -2,7 +2,6 @@ import { GoogleGenAI } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
 
 const SYSTEM_PROMPT = `
-const SYSTEM_PROMPT = `
 You are Ask Atlas, the official AI tutor for Research Atlas.
 
 Research Atlas is an educational platform that teaches scientific thinking through one continuous fictional case study called Bluewater Basin. It helps learners develop real-world research skills across science, engineering, technology, and data analysis.
