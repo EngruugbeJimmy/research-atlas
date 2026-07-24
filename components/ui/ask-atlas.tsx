@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, X, Send } from "lucide-react";
+import {
+    Sparkles,
+    X,
+    Send,
+    Share2,
+    Copy,
+    ThumbsUp
+} from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { answerAskAtlas } from "@/lib/ask-atlas";
 
@@ -44,6 +51,64 @@ export function AskAtlas() {
     setMessages((m) => [...m, { role: "atlas", content: reply }]);
 
     setPending(false);
+    function shareAskAtlas() {
+
+    const text =
+`🚀 I'm learning research with Ask Atlas on Research Atlas.
+
+Ask Atlas explains Statistics, GIS, AI, Python, Machine Learning and Scientific Research in simple language.
+
+Try it yourself:
+
+https://research-atlas-chi.vercel.app`;
+
+function shareMessage(text: string) {
+
+    const message =
+`${text}
+
+Learn more with Ask Atlas
+
+https://research-atlas-chi.vercel.app`;
+
+    if (navigator.share) {
+
+        navigator.share({
+
+            title: "Ask Atlas",
+
+            text: message,
+
+        });
+
+    } else {
+
+        window.open(
+            `https://wa.me/?text=${encodeURIComponent(message)}`,
+            "_blank"
+        );
+
+    }
+
+}
+    if (navigator.share) {
+
+        navigator.share({
+            title: "Research Atlas",
+            text,
+            url: "https://research-atlas-chi.vercel.app",
+        });
+
+    } else {
+
+        window.open(
+            `https://wa.me/?text=${encodeURIComponent(text)}`,
+            "_blank"
+        );
+
+    }
+
+}
   }
 
   return (
@@ -83,12 +148,28 @@ export function AskAtlas() {
                 </div>
               </div>
 
-              <button
-                onClick={() => setOpen(false)}
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-2">
+
+    {/* Share Ask Atlas */}
+
+    <button
+        onClick={shareAskAtlas}
+        title="Share Ask Atlas"
+        className="rounded-full p-2 hover:bg-white/10"
+    >
+        <Share2 className="h-4 w-4" />
+    </button>
+
+    {/* Close */}
+
+    <button
+        onClick={() => setOpen(false)}
+        title="Close"
+    >
+        <X className="h-4 w-4" />
+    </button>
+
+</div>
             </div>
 
             {/* Quick Topics */}
@@ -129,7 +210,37 @@ export function AskAtlas() {
                       : "ml-auto bg-signal-500/20 text-ink dark:text-paper"
                   )}
                 >
-                  {m.content}
+                  <div>
+
+    {m.content}
+
+    {m.role === "atlas" && (
+
+        <div className="mt-3 flex gap-2">
+
+            <button
+                onClick={() => copyMessage(m.content)}
+                className="text-xs"
+            >
+                <Copy className="h-3 w-3" />
+            </button>
+
+            <button
+                onClick={() => shareMessage(m.content)}
+                className="text-xs"
+            >
+                <Share2 className="h-3 w-3" />
+            </button>
+
+            <button className="text-xs">
+                <ThumbsUp className="h-3 w-3" />
+            </button>
+
+        </div>
+
+    )}
+
+</div>
                 </div>
               ))}
 
