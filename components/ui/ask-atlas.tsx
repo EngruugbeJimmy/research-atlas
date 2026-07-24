@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
@@ -23,6 +23,8 @@ const suggestedPrompts = [
   "Quiz me on this mission",
 ];
 
+const topics = ["Statistics", "GIS", "Machine Learning", "Python", "Research", "Bluewater Basin"];
+
 const ATLAS_URL = "https://research-atlas-chi.vercel.app";
 
 interface Message {
@@ -43,6 +45,18 @@ export function AskAtlas() {
   const [pending, setPending] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Once the learner has actually sent something, the onboarding chrome
+  // (quick topics + suggested prompts) steps aside to give the
+  // conversation itself the room — this is the "prioritize the
+  // conversation" behavior the panel is built around.
+  const hasStartedChat = messages.some((m) => m.role === "user");
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, pending]);
+
   async function send(text: string) {
     if (!text.trim() || pending) return;
 
@@ -56,8 +70,6 @@ export function AskAtlas() {
     setPending(false);
   }
 
-  // Shares any single piece of text (used for both the header "share Ask
-  // Atlas" button and each individual message's share button).
   function shareMessage(text: string) {
     const message = `${text}\n\nLearn more with Ask Atlas\n\n${ATLAS_URL}`;
 
@@ -82,8 +94,7 @@ export function AskAtlas() {
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex((current) => (current === index ? null : current)), 1500);
     } catch {
-      // Clipboard API can fail (permissions, insecure context, etc.) — fail silently
-      // rather than throwing, since copying is a nice-to-have, not critical.
+      // Copying is a nice-to-have — fail silently rather than throwing.
     }
   }
 
@@ -110,10 +121,10 @@ export function AskAtlas() {
             transition={{ duration: 0.2 }}
             role="dialog"
             aria-label="Ask Atlas assistant"
-            className="fixed bottom-6 right-6 z-50 flex h-[560px] w-[380px] max-w-[92vw] flex-col overflow-hidden rounded-2xl border border-basin-500/20 bg-paper shadow-2xl dark:bg-ink-800"
+            className="fixed bottom-6 right-6 z-50 flex h-[80vh] max-h-[80vh] w-[480px] max-w-[92vw] flex-col overflow-hidden rounded-2xl border border-basin-500/20 bg-paper shadow-2xl dark:bg-ink-800"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-basin-500/15 bg-basin-500 px-4 py-3 text-paper">
+            {/* Header — fixed */}
+            <div className="flex shrink-0 items-center justify-between border-b border-basin-500/15 bg-basin-500 px-4 py-3 text-paper">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-signal-400" />
                 <div>
@@ -143,28 +154,27 @@ export function AskAtlas() {
               </div>
             </div>
 
-            {/* Quick Topics */}
-            <div className="border-b border-basin-500/10 px-4 py-2">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-basin-500">
-                Explore Topics
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {["Statistics", "GIS", "Machine Learning", "Python", "Research", "Bluewater Basin"].map(
-                  (topic) => (
+            {/* Quick Topics — compact, collapses once the chat has started */}
+            {!hasStartedChat && (
+              <div className="shrink-0 border-b border-basin-500/10 px-4 py-2">
+                <div className="flex gap-1.5 overflow-x-auto whitespace-nowrap pb-0.5">
+                  {topics.map((topic) => (
                     <button
                       key={topic}
                       onClick={() => setInput(`Explain ${topic}`)}
-                      className="rounded-full border border-basin-500/20 px-2.5 py-1 text-xs transition hover:bg-basin-500/10"
+                      className="shrink-0 rounded-full border border-basin-500/20 px-2 py-0.5 text-[11px] transition hover:bg-basin-500/10"
                     >
                       {topic}
                     </button>
-                  )
-                )}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Chat */}
-            <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+            {/* Conversation — the panel's main event, flex-1 so it fills
+                whatever space the fixed header/topics/input leave behind
+                (roughly 75-80% of the 80vh panel in practice). */}
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
               {messages.map((m, i) => (
                 <div
                   key={i}
@@ -211,21 +221,25 @@ export function AskAtlas() {
                   🤖 Atlas AI is thinking...
                 </div>
               )}
+
+              <div ref={messagesEndRef} />
             </div>
 
-            {/* Footer */}
-            <div className="border-t border-basin-500/15 p-3">
-              <div className="mb-3 flex flex-wrap gap-2">
-                {suggestedPrompts.map((prompt) => (
-                  <button
-                    key={prompt}
-                    onClick={() => send(prompt)}
-                    className="rounded-full border border-basin-500/25 px-2.5 py-1 text-xs text-basin-500 transition hover:bg-basin-500/10"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
+            {/* Input — fixed at the bottom */}
+            <div className="shrink-0 border-t border-basin-500/15 p-3">
+              {!hasStartedChat && (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {suggestedPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => send(prompt)}
+                      className="rounded-full border border-basin-500/25 px-2.5 py-1 text-xs text-basin-500 transition hover:bg-basin-500/10"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <form
                 onSubmit={(e) => {
