@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    Sparkles,
-    X,
-    Send,
-    Share2,
-    Copy,
-    ThumbsUp
+  Sparkles,
+  X,
+  Send,
+  Share2,
+  Copy,
+  Check,
+  ThumbsUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { answerAskAtlas } from "@/lib/ask-atlas";
@@ -21,6 +22,8 @@ const suggestedPrompts = [
   "Help me solve a research problem",
   "Quiz me on this mission",
 ];
+
+const ATLAS_URL = "https://research-atlas-chi.vercel.app";
 
 interface Message {
   role: "user" | "atlas";
@@ -38,6 +41,7 @@ export function AskAtlas() {
     },
   ]);
   const [pending, setPending] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   async function send(text: string) {
     if (!text.trim() || pending) return;
@@ -49,66 +53,38 @@ export function AskAtlas() {
     const reply = await answerAskAtlas(text);
 
     setMessages((m) => [...m, { role: "atlas", content: reply }]);
-
     setPending(false);
-    function shareAskAtlas() {
+  }
 
-    const text =
-`🚀 I'm learning research with Ask Atlas on Research Atlas.
-
-Ask Atlas explains Statistics, GIS, AI, Python, Machine Learning and Scientific Research in simple language.
-
-Try it yourself:
-
-https://research-atlas-chi.vercel.app`;
-
-function shareMessage(text: string) {
-
-    const message =
-`${text}
-
-Learn more with Ask Atlas
-
-https://research-atlas-chi.vercel.app`;
+  // Shares any single piece of text (used for both the header "share Ask
+  // Atlas" button and each individual message's share button).
+  function shareMessage(text: string) {
+    const message = `${text}\n\nLearn more with Ask Atlas\n\n${ATLAS_URL}`;
 
     if (navigator.share) {
-
-        navigator.share({
-
-            title: "Ask Atlas",
-
-            text: message,
-
-        });
-
+      navigator.share({ title: "Ask Atlas", text: message });
     } else {
-
-        window.open(
-            `https://wa.me/?text=${encodeURIComponent(message)}`,
-            "_blank"
-        );
-
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank");
     }
+  }
 
-}
-    if (navigator.share) {
+  function shareAskAtlas() {
+    shareMessage(
+      "🚀 I'm learning research with Ask Atlas on Research Atlas.\n\n" +
+        "Ask Atlas explains Statistics, GIS, AI, Python, Machine Learning and Scientific Research in simple language.\n\n" +
+        "Try it yourself:"
+    );
+  }
 
-        navigator.share({
-            title: "Research Atlas",
-            text,
-            url: "https://research-atlas-chi.vercel.app",
-        });
-
-    } else {
-
-        window.open(
-            `https://wa.me/?text=${encodeURIComponent(text)}`,
-            "_blank"
-        );
-
+  async function copyMessage(text: string, index: number) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex((current) => (current === index ? null : current)), 1500);
+    } catch {
+      // Clipboard API can fail (permissions, insecure context, etc.) — fail silently
+      // rather than throwing, since copying is a nice-to-have, not critical.
     }
-
-}
   }
 
   return (
@@ -142,34 +118,29 @@ https://research-atlas-chi.vercel.app`;
                 <Sparkles className="h-4 w-4 text-signal-400" />
                 <div>
                   <p className="font-semibold">Ask Atlas</p>
-                  <p className="text-xs opacity-80">
-                    Your AI Research Tutor
-                  </p>
+                  <p className="text-xs opacity-80">Your AI Research Tutor</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
+                <button
+                  onClick={shareAskAtlas}
+                  title="Share Ask Atlas"
+                  aria-label="Share Ask Atlas"
+                  className="rounded-full p-2 hover:bg-white/10"
+                >
+                  <Share2 className="h-4 w-4" />
+                </button>
 
-    {/* Share Ask Atlas */}
-
-    <button
-        onClick={shareAskAtlas}
-        title="Share Ask Atlas"
-        className="rounded-full p-2 hover:bg-white/10"
-    >
-        <Share2 className="h-4 w-4" />
-    </button>
-
-    {/* Close */}
-
-    <button
-        onClick={() => setOpen(false)}
-        title="Close"
-    >
-        <X className="h-4 w-4" />
-    </button>
-
-</div>
+                <button
+                  onClick={() => setOpen(false)}
+                  title="Close"
+                  aria-label="Close Ask Atlas"
+                  className="rounded-full p-2 hover:bg-white/10"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
             {/* Quick Topics */}
@@ -177,24 +148,18 @@ https://research-atlas-chi.vercel.app`;
               <p className="mb-2 text-xs font-medium uppercase tracking-wide text-basin-500">
                 Explore Topics
               </p>
-
               <div className="flex flex-wrap gap-2">
-                {[
-                  "Statistics",
-                  "GIS",
-                  "Machine Learning",
-                  "Python",
-                  "Research",
-                  "Bluewater Basin",
-                ].map((topic) => (
-                  <button
-                    key={topic}
-                    onClick={() => setInput(`Explain ${topic}`)}
-                    className="rounded-full border border-basin-500/20 px-2.5 py-1 text-xs transition hover:bg-basin-500/10"
-                  >
-                    {topic}
-                  </button>
-                ))}
+                {["Statistics", "GIS", "Machine Learning", "Python", "Research", "Bluewater Basin"].map(
+                  (topic) => (
+                    <button
+                      key={topic}
+                      onClick={() => setInput(`Explain ${topic}`)}
+                      className="rounded-full border border-basin-500/20 px-2.5 py-1 text-xs transition hover:bg-basin-500/10"
+                    >
+                      {topic}
+                    </button>
+                  )
+                )}
               </div>
             </div>
 
@@ -211,36 +176,33 @@ https://research-atlas-chi.vercel.app`;
                   )}
                 >
                   <div>
-
-    {m.content}
-
-    {m.role === "atlas" && (
-
-        <div className="mt-3 flex gap-2">
-
-            <button
-                onClick={() => copyMessage(m.content)}
-                className="text-xs"
-            >
-                <Copy className="h-3 w-3" />
-            </button>
-
-            <button
-                onClick={() => shareMessage(m.content)}
-                className="text-xs"
-            >
-                <Share2 className="h-3 w-3" />
-            </button>
-
-            <button className="text-xs">
-                <ThumbsUp className="h-3 w-3" />
-            </button>
-
-        </div>
-
-    )}
-
-</div>
+                    {m.content}
+                    {m.role === "atlas" && (
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          onClick={() => copyMessage(m.content, i)}
+                          aria-label="Copy message"
+                          className="text-xs"
+                        >
+                          {copiedIndex === i ? (
+                            <Check className="h-3 w-3 text-signal-500" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => shareMessage(m.content)}
+                          aria-label="Share message"
+                          className="text-xs"
+                        >
+                          <Share2 className="h-3 w-3" />
+                        </button>
+                        <button aria-label="Helpful" className="text-xs">
+                          <ThumbsUp className="h-3 w-3" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
 
@@ -253,7 +215,6 @@ https://research-atlas-chi.vercel.app`;
 
             {/* Footer */}
             <div className="border-t border-basin-500/15 p-3">
-
               <div className="mb-3 flex flex-wrap gap-2">
                 {suggestedPrompts.map((prompt) => (
                   <button
@@ -279,7 +240,6 @@ https://research-atlas-chi.vercel.app`;
                   placeholder="Ask anything about research, science, AI, programming or this mission..."
                   className="flex-1 rounded-full border border-basin-500/25 bg-transparent px-4 py-2 text-sm outline-none focus:border-basin-500"
                 />
-
                 <button
                   type="submit"
                   aria-label="Send"
