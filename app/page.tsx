@@ -343,7 +343,7 @@ export default function HomePage() {
             </h2>
             <p className="mt-4 max-w-2xl text-ink/65 dark:text-paper/65">
               Every mission is a real milestone in investigating Bluewater
-              Basin — numbered because the order genuinely matters. Mission 7&apos;s
+              Basin, numbered because the order genuinely matters. Mission 7&apos;s
               model depends on the wells you mapped in Mission 1.
             </p>
           </Reveal>
