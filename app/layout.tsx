@@ -13,7 +13,7 @@ const siteUrl = "https://research-atlas.dev";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Research Atlas — Learn Research Like a Scientist",
+    default: "Research Atlas | Learn Research Like a Scientist",
     template: "%s · Research Atlas",
   },
   description:
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   keywords: ["learn statistics","learn GIS","learn machine learning","environmental data science","research methods","scientific computing"],
   authors: [{ name: "Research Atlas" }],
   openGraph: {
-    title: "Research Atlas — Learn Research Like a Scientist",
+    title: "Research Atlas | Learn Research Like a Scientist",
     description: "Become a confident researcher by investigating one realistic watershed, Bluewater Basin, mission by mission.",
     url: siteUrl,
     siteName: "Research Atlas",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Research Atlas — Learn Research Like a Scientist",
+    title: "Research Atlas | Learn Research Like a Scientist",
     description: "Statistics, GIS, ML and AI taught through one continuous environmental research expedition.",
   },
   icons: { icon: "/favicon.svg" },
