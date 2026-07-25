@@ -14,7 +14,7 @@ export default function SimulationsPage() {
       <h1 className="mt-2 text-4xl font-medium">Simulations</h1>
       <p className="mt-4 max-w-2xl text-ink/70 dark:text-paper/70">
         Every difficult idea in Research Atlas becomes something you can
-        drag, click, or watch move. These are standalone — no mission
+        drag, click, or watch move. These are standalone  no mission
         progress required.
       </p>
       <div className="mt-10 grid gap-6 md:grid-cols-2">
