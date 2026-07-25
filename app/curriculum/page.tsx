@@ -49,7 +49,7 @@ export default function CurriculumPage() {
       <p className="type-eyebrow">What you&apos;ll actually learn</p>
       <h1 className="mt-2 text-4xl font-medium">Curriculum</h1>
       <p className="mt-4 max-w-2xl text-ink/70 dark:text-paper/70">
-        Research Atlas doesn&apos;t teach subjects in isolation — every track
+        Research Atlas doesn&apos;t teach subjects in isolation  every track
         below is woven through the thirteen missions, in the order a real
         research project would need it.
       </p>
