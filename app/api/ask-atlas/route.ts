@@ -198,10 +198,6 @@ ${prompt}`,
   },
 });
 
-User Question:
-${prompt}`,
-    });
-
     const reply =
       response.text ??
       "I'm sorry, I couldn't generate a response. Please try asking your question differently.";
