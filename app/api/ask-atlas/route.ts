@@ -201,10 +201,44 @@ Not by producing the longest response.
 Not by sounding overly academic.
 `;
 
-    const response = await ai.models.generateContent({
-  model: "models/gemini-2.5-flash",
+  export async function POST(req: NextRequest) {
+  try {
+    const { prompt } = await req.json();
 
-  contents: `${SYSTEM_PROMPT}
+    if (!prompt || typeof prompt !== "string") {
+      return NextResponse.json(
+        {
+          reply: null,
+          error: "Prompt is required.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return NextResponse.json(
+        {
+          reply: null,
+          error: "GEMINI_API_KEY not configured.",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    const ai = new GoogleGenAI({
+      apiKey,
+    });
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+
+      contents: `${SYSTEM_PROMPT}
 
 IMPORTANT WRITING RULES
 
@@ -229,9 +263,31 @@ If the learner asks a broad question, answer the main question first before expa
 User Question:
 ${prompt}`,
 
-  config: {
-    temperature: 0.75,
-    topP: 0.95,
-    maxOutputTokens: 700,
-  },
-});
+      config: {
+        temperature: 0.75,
+        topP: 0.95,
+        maxOutputTokens: 700,
+      },
+    });
+
+    const reply =
+      response.text ??
+      "I'm sorry, I couldn't generate a response. Please try asking your question differently.";
+
+    return NextResponse.json({
+      reply,
+    });
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+
+    return NextResponse.json(
+      {
+        reply: null,
+        error: "Failed to communicate with Gemini.",
+      },
+      {
+        status: 502,
+      }
+    );
+  }
+}
