@@ -236,7 +236,7 @@ Not by sounding overly academic.
     });
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "models/gemini-3.5-flash",
 
       contents: `${SYSTEM_PROMPT}
 
