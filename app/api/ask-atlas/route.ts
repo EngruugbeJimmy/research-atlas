@@ -335,7 +335,7 @@ ${prompt}`,
         systemInstruction: SYSTEM_PROMPT,
         temperature: 0.8,
         topP: 0.95,
-        maxOutputTokens: 1000,
+        maxOutputTokens: 1300,
       },
     });
 
