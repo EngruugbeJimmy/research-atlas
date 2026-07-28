@@ -15,6 +15,7 @@ import {
   createEmptyStages,
   ExamResult,
   Faculty,
+  StageMessage,
 } from "@/lib/lab/types";
 
 const STORAGE_KEY = "research-atlas-lab-sessions";
@@ -99,6 +100,22 @@ export function useLabSession() {
     });
   }
 
+  // NEW — appends chat messages (recruit or professor) to a stage's history.
+  // Needed by components/lab/stage-supervision.tsx so conversation turns
+  // actually get saved, the same way updateStageDraft saves the written
+  // draft text.
+  function appendStageMessages(id: string, stage: LifecycleStage, newMessages: StageMessage[]) {
+    const session = store.sessions[id];
+    if (!session) return;
+    const stageRecord = session.stages[stage];
+    updateSession(id, {
+      stages: {
+        ...session.stages,
+        [stage]: { ...stageRecord, messages: [...stageRecord.messages, ...newMessages] },
+      },
+    });
+  }
+
   function completeStage(id: string, stage: LifecycleStage) {
     const session = store.sessions[id];
     if (!session) return;
@@ -128,6 +145,7 @@ export function useLabSession() {
     recordExamResult,
     assignFaculty,
     updateStageDraft,
+    appendStageMessages,
     completeStage,
     updateSession,
   };
