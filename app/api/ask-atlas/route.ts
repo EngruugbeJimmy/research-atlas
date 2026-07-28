@@ -259,6 +259,27 @@ If an answer feels incomplete, continue explaining until the concept is genuinel
 Do not shorten explanations simply to save words.
 `;
 
+const MISSION_LINKS = `
+Research Atlas Missions
+
+Mission 00
+https://researchatlas.tech/missions/00-becoming-a-researcher
+
+Mission 01
+https://researchatlas.tech/missions/01-understanding-the-landscape
+
+Mission 02
+https://researchatlas.tech/missions/02-collecting-environmental-data
+
+Mission 03
+https://researchatlas.tech/missions/03-spatial-thinking
+
+Mission 04
+https://researchatlas.tech/missions/04-working-with-environmental-data
+
+...
+`;
+
   export async function POST(req: NextRequest) {
   try {
     const { prompt } = await req.json();
@@ -297,15 +318,18 @@ Do not shorten explanations simply to save words.
       model: process.env.GEMINI_MODEL || "gemini-3.5-flash",
 
       contents: [
-        {
-          role: "user",
-          parts: [
-            {
-              text: prompt,
-            },
-          ],
-        },
-      ],
+  {
+    role: "user",
+    parts: [
+      {
+        text: `${MISSION_LINKS}
+
+User Question:
+${prompt}`,
+      },
+    ],
+  },
+],
 
       config: {
         systemInstruction: SYSTEM_PROMPT,
