@@ -28,7 +28,12 @@ export function parseReadinessScorecard(
   for (const line of lines) {
     const match = FIELD_PATTERN.exec(line);
     if (!match) break; // first non-field line = where the professor's plain-language explanation resumes
-    fields[match[1].toLowerCase()] = match[2].trim();
+
+    const key = match[1];
+    const value = match[2];
+    if (!key || !value) break; // guards TypeScript's noUncheckedIndexedAccess — the regex guarantees both groups when match succeeds, but the type system doesn't know that
+
+    fields[key.toLowerCase()] = value.trim();
     consumedLines++;
   }
 
