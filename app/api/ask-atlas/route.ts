@@ -289,41 +289,55 @@ Do not shorten explanations simply to save words.
       );
     }
 
-    const ai = new GoogleGenAI({
+        const ai = new GoogleGenAI({
       apiKey,
     });
 
     const response = await ai.models.generateContent({
-  model: process.env.GEMINI_MODEL || "gemini-3.5-flash",
+      model: process.env.GEMINI_MODEL || "gemini-3.5-flash",
 
-  contents: prompt,
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: prompt,
+            },
+          ],
+        },
+      ],
 
-  config: {
-    systemInstruction: SYSTEM_PROMPT,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        temperature: 0.8,
+        topP: 0.95,
+        maxOutputTokens: 1400,
+      },
+    });
 
-    temperature: 0.8,
-    topP: 0.95,
-    maxOutputTokens: 1400,
-  },
-});
+    const reply =
+      response.text?.trim() ||
+      "I'm sorry, I couldn't generate a response. Please try asking your question differently.";
 
-const reply =
-  response.text?.trim() ||
-  "I'm sorry, I couldn't generate a response. Please try asking your question differently.";
+    return NextResponse.json({
+      reply,
+    });
+  } catch (error) {
+    console.error("Gemini API Error:", error);
 
-return NextResponse.json({
-  reply,
-}); catch (error) {
-  console.error("Gemini API Error:", error);
-
-  return NextResponse.json(
-    {
-      reply: null,
-      error: error instanceof Error ? error.message : String(error),
-    },
-    {
-      status: 500,
-    }
-  );
-}
+    return NextResponse.json(
+      {
+        reply: null,
+        error: error instanceof Error ? error.message : String(error),
+        stack:
+          process.env.NODE_ENV === "development" &&
+          error instanceof Error
+            ? error.stack
+            : undefined,
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 }
