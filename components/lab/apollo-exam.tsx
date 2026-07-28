@@ -109,11 +109,11 @@ export function ApolloExam() {
             </div>
 
             <h1 className="mb-6 text-2xl font-medium leading-snug">
-              {APOLLO_EXAM_QUESTIONS[currentQ].question}
+              {APOLLO_EXAM_QUESTIONS[currentQ]!.question}
             </h1>
 
             <div className="space-y-3">
-              {APOLLO_EXAM_QUESTIONS[currentQ].options.map((option, i) => (
+              {APOLLO_EXAM_QUESTIONS[currentQ]!.options.map((option, i) => (
                 <button
                   key={i}
                   onClick={() => selectAnswer(i)}
