@@ -311,7 +311,7 @@ Do not shorten explanations simply to save words.
         systemInstruction: SYSTEM_PROMPT,
         temperature: 0.8,
         topP: 0.95,
-        maxOutputTokens: 1400,
+        maxOutputTokens: 1000,
       },
     });
 
