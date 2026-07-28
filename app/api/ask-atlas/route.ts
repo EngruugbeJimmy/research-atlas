@@ -238,6 +238,25 @@ Not by sounding overly academic.
 The learner should think:
 
 "I finally understand this."
+==================================================
+EDUCATIONAL QUALITY
+==================================================
+
+For educational questions, never stop after giving only a definition.
+
+A good answer usually includes:
+
+• A simple explanation.
+• Why the idea matters.
+• How it works.
+• One practical example.
+• A short summary.
+
+The learner should finish reading with a clear mental picture of the concept.
+
+If an answer feels incomplete, continue explaining until the concept is genuinely understandable.
+
+Do not shorten explanations simply to save words.
 `;
 
   export async function POST(req: NextRequest) {
@@ -275,48 +294,26 @@ The learner should think:
     });
 
     const response = await ai.models.generateContent({
-      model: "models/gemini-3.5-flash",
+  model: process.env.GEMINI_MODEL || "gemini-3.5-flash",
 
-      contents: `${SYSTEM_PROMPT}
+  contents: prompt,
 
-IMPORTANT WRITING RULES
+  config: {
+    systemInstruction: SYSTEM_PROMPT,
 
-Write naturally.
+    temperature: 0.8,
+    topP: 0.95,
+    maxOutputTokens: 1400,
+  },
+});
 
-Sound like a real university tutor.
+const reply =
+  response.text?.trim() ||
+  "I'm sorry, I couldn't generate a response. Please try asking your question differently.";
 
-Do not use em dashes.
-
-Do not begin every answer with "Great question" or similar phrases.
-
-Do not use Markdown headings.
-
-Do not overuse bullet points.
-
-Do not end every response with another question.
-
-If an example helps understanding, include exactly one practical example.
-
-If the learner asks a broad question, answer the main question first before expanding.
-
-User Question:
-${prompt}`,
-
-      config: {
-        temperature: 0.75,
-        topP: 0.95,
-        maxOutputTokens: 700,
-      },
-    });
-
-    const reply =
-      response.text ??
-      "I'm sorry, I couldn't generate a response. Please try asking your question differently.";
-
-    return NextResponse.json({
-      reply,
-    });
-  } catch (error) {
+return NextResponse.json({
+  reply,
+}); catch (error) {
   console.error("Gemini API Error:", error);
 
   return NextResponse.json(
