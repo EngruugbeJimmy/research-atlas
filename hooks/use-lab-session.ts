@@ -1,13 +1,20 @@
 // hooks/use-lab-session.ts
 //
 // Persists Lab sessions to localStorage, mirroring the pattern already
-// used by useProgress. A recruit can have multiple sessions over time
-// (e.g. one per topic/faculty attempted) — sessions is a map, with
-// activeSessionId pointing at the one currently open.
+// used by useProgress.
+//
+// IMPORTANT: this is now Context-backed, not a plain useState hook. If
+// every component that calls useLabSession() got its own independent
+// localStorage-backed state, one component's update (e.g. ApolloExam
+// recording an exam result) would never be visible to a sibling/parent
+// component (e.g. the page deciding what screen to show next) until a
+// full page reload. Wrapping in a Context makes all consumers share one
+// real state instance. The public API below (useLabSession()) is
+// unchanged — existing components using it don't need any edits.
 
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import {
   LabSession,
   LifecycleStage,
@@ -39,7 +46,7 @@ function saveStore(store: LabStore) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
 }
 
-export function useLabSession() {
+function useLabSessionInternal() {
   const [store, setStore] = useState<LabStore>({ sessions: {}, activeSessionId: null });
   const [hydrated, setHydrated] = useState(false);
 
@@ -100,10 +107,6 @@ export function useLabSession() {
     });
   }
 
-  // NEW — appends chat messages (recruit or professor) to a stage's history.
-  // Needed by components/lab/stage-supervision.tsx so conversation turns
-  // actually get saved, the same way updateStageDraft saves the written
-  // draft text.
   function appendStageMessages(id: string, stage: LifecycleStage, newMessages: StageMessage[]) {
     const session = store.sessions[id];
     if (!session) return;
@@ -149,4 +152,21 @@ export function useLabSession() {
     completeStage,
     updateSession,
   };
+}
+
+type LabSessionContextValue = ReturnType<typeof useLabSessionInternal>;
+const LabSessionContext = createContext<LabSessionContextValue | null>(null);
+
+export function LabSessionProvider({ children }: { children: ReactNode }) {
+  const value = useLabSessionInternal();
+  return <LabSessionContext.Provider value={value}>{children}</LabSessionContext.Provider>;
+}
+
+/** Unchanged public API — every existing component using this still works as-is. */
+export function useLabSession(): LabSessionContextValue {
+  const ctx = useContext(LabSessionContext);
+  if (!ctx) {
+    throw new Error("useLabSession() must be used within a <LabSessionProvider> — see app/lab/layout.tsx");
+  }
+  return ctx;
 }
