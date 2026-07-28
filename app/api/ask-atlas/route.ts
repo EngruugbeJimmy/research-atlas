@@ -278,16 +278,16 @@ ${prompt}`,
       reply,
     });
   } catch (error) {
-    console.error("Gemini API Error:", error);
+  console.error("Gemini API Error:", error);
 
-    return NextResponse.json(
-      {
-        reply: null,
-        error: "Failed to communicate with Gemini.",
-      },
-      {
-        status: 502,
-      }
-    );
-  }
+  return NextResponse.json(
+    {
+      reply: null,
+      error: error instanceof Error ? error.message : String(error),
+    },
+    {
+      status: 500,
+    }
+  );
+}
 }
