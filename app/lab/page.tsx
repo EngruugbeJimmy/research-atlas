@@ -58,7 +58,7 @@ export default function LabEntryPage() {
           ))}
         </div>
         <div className="mt-8 flex justify-center gap-3">
-          
+ <a         
             href="/missions"
             className="rounded-xl bg-basin-500 px-6 py-3 font-semibold text-paper hover:bg-basin-600"
           >
