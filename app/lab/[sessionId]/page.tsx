@@ -11,7 +11,7 @@ import { LIFECYCLE_STAGES, type LifecycleStage } from "@/lib/lab/types";
 export default function LabWorkspacePage() {
   const params = useParams<{ sessionId: string }>();
   const { hydrated, sessions, setActiveSessionId } = useLabSession();
-  const [activeStage, setActiveStage] = useState<LifecycleStage>(LIFECYCLE_STAGES[0]);
+  const [activeStage, setActiveStage] = useState<LifecycleStage>(LIFECYCLE_STAGES[0] ?? "ideation");
 
   const session = sessions[params.sessionId];
 
