@@ -19,6 +19,8 @@ interface HistoryTurn {
 export interface LabChatResult {
   reply: string;
   scorecard: import("@/lib/lab/types").ReadinessScorecard | null;
+  stageComplete: boolean;
+  stageDraft: string | null;
   /** True if this is a real professor response; false if the API call failed. */
   ok: boolean;
 }
@@ -51,13 +53,21 @@ export async function sendLabMessage(
     }
 
     const data = await res.json();
-    return { reply: data.reply as string, scorecard: data.scorecard ?? null, ok: true };
+   return {
+  reply: data.reply as string,
+  scorecard: data.scorecard ?? null,
+  stageComplete: data.stageComplete ?? false,
+  stageDraft: data.stageDraft ?? null,
+  ok: true,
+};
   } catch (err) {
     console.error("Lab chat error:", err);
     return {
       reply:
         "I'm having trouble connecting right now — this isn't feedback on your work, just a connection issue. Please try again in a moment, and if it persists, check that the Lab's AI service is configured correctly.",
       scorecard: null,
+      stageComplete: false,
+       stageDraft: null,
       ok: false,
     };
   }
