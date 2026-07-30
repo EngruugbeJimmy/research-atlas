@@ -24,7 +24,8 @@ import { FaqAccordion } from "@/components/ui/faq-accordion";
 import { Reveal } from "@/components/ui/reveal";
 import { HeroBackground } from "@/components/home/hero-background";
 import { domains } from "@/lib/domains/data";
-
+import { parseReadinessScorecard } from "@/lib/lab/scorecard";
+import { parseStageCompletion } from "@/lib/lab/stage-completion";
 const domainIcons: Record<string, typeof Droplets> = {
   "environmental-science": Droplets,
   "life-sciences": Leaf,

@@ -15,6 +15,7 @@ import { ADAM_SMITH_SYSTEM_PROMPT } from "@/lib/lab/professors/adam-smith";
 import { NEWTON_SYSTEM_PROMPT } from "@/lib/lab/professors/newton";
 import { DARWIN_SYSTEM_PROMPT } from "@/lib/lab/professors/darwin";
 import { parseReadinessScorecard } from "@/lib/lab/scorecard";
+import { parseStageCompletion } from "@/lib/lab/stage-completion";
 import type { Faculty } from "@/lib/lab/types";
 
 type ProfessorKey = Faculty | "apollo";
@@ -79,13 +80,26 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const rawReply = response.text ?? "I'm sorry, I couldn't generate a response. Please try again.";
-    const { scorecard, cleanedText } = parseReadinessScorecard(rawReply);
+    const rawReply =
+  response.text ?? "I'm sorry, I couldn't generate a response. Please try again.";
 
-    return NextResponse.json({
-      reply: cleanedText,
-      scorecard, // null unless this specific response actually contained a scorecard block
-    });
+const {
+  scorecard,
+  cleanedText: afterScorecard,
+} = parseReadinessScorecard(rawReply);
+
+const {
+  stageComplete,
+  stageDraft,
+  cleanedText,
+} = parseStageCompletion(afterScorecard);
+
+return NextResponse.json({
+  reply: cleanedText,
+  scorecard,
+  stageComplete,
+  stageDraft,
+});
   } catch (error) {
     console.error("Lab API Error:", error);
     return NextResponse.json({ reply: null, error: "Failed to communicate with Gemini." }, { status: 502 });
