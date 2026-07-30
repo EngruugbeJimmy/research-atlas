@@ -16,8 +16,9 @@ export default function LabWorkspacePage() {
   const session = sessions[params.sessionId];
 
   useEffect(() => {
-    if (hydrated && session) setActiveSessionId(params.sessionId);
-  }, [hydrated, session, params.sessionId, setActiveSessionId]);
+  if (hydrated && params.sessionId) setActiveSessionId(params.sessionId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [hydrated, params.sessionId]);
 
   useEffect(() => {
     if (!session) return;
