@@ -3,14 +3,14 @@
 // Persists Lab sessions to localStorage, mirroring the pattern already
 // used by useProgress.
 //
-// IMPORTANT: every mutator below uses React's functional setState form
-// (setStore(prev => ...)) instead of reading the `store` variable
-// directly. This matters because multiple updates can fire back-to-back
-// synchronously (e.g. apollo-exam.tsx's confirmHandoff calls
-// assignFaculty then updateSession with no gap between them) — reading
-// `store` directly in that situation reads stale data from before the
-// first update applied, silently erasing it. The functional form always
-// sees the truly latest state, no matter how many updates stack up.
+// CRITICAL: every function this hook returns is wrapped in useCallback.
+// Without that, each one is a brand-new function on every render — and
+// if any of them end up in a useEffect dependency array (as
+// setActiveSessionId does in app/lab/[sessionId]/page.tsx), React sees
+// "a dependency changed" every single render, re-runs the effect, which
+// calls the function, which updates state, which re-renders, which
+// creates a new function again — an infinite loop that freezes the
+// entire page, including completely unrelated things like nav clicks.
 
 "use client";
 
@@ -55,9 +55,6 @@ function useLabSessionInternal() {
     setHydrated(true);
   }, []);
 
-  // Every write goes through this one place, using the functional form,
-  // and persists to localStorage using the freshly-computed value —
-  // never the possibly-stale `store` variable from the outer scope.
   const mutate = useCallback((updater: (prev: LabStore) => LabStore) => {
     setStore((prev) => {
       const next = updater(prev);
@@ -68,7 +65,7 @@ function useLabSessionInternal() {
 
   const activeSession = store.activeSessionId ? store.sessions[store.activeSessionId] ?? null : null;
 
-  function startNewSession(): string {
+  const startNewSession = useCallback((): string => {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     const session: LabSession = {
@@ -88,89 +85,112 @@ function useLabSessionInternal() {
       activeSessionId: id,
     }));
     return id;
-  }
+  }, [mutate]);
 
-  function updateSession(id: string, patch: Partial<LabSession>) {
-    mutate((prev) => {
-      const existing = prev.sessions[id];
-      if (!existing) return prev;
-      const updated: LabSession = { ...existing, ...patch, updatedAt: new Date().toISOString() };
-      return { ...prev, sessions: { ...prev.sessions, [id]: updated } };
-    });
-  }
+  const updateSession = useCallback(
+    (id: string, patch: Partial<LabSession>) => {
+      mutate((prev) => {
+        const existing = prev.sessions[id];
+        if (!existing) return prev;
+        const updated: LabSession = { ...existing, ...patch, updatedAt: new Date().toISOString() };
+        return { ...prev, sessions: { ...prev.sessions, [id]: updated } };
+      });
+    },
+    [mutate]
+  );
 
-  function recordExamResult(id: string, result: ExamResult) {
-    updateSession(id, {
-      examResult: result,
-      status: result.passed ? "in_progress" : "routed_to_missions",
-    });
-  }
+  const recordExamResult = useCallback(
+    (id: string, result: ExamResult) => {
+      updateSession(id, {
+        examResult: result,
+        status: result.passed ? "in_progress" : "routed_to_missions",
+      });
+    },
+    [updateSession]
+  );
 
-  function assignFaculty(id: string, faculty: Faculty, topic: string) {
-    updateSession(id, { faculty, topic });
-  }
+  const assignFaculty = useCallback(
+    (id: string, faculty: Faculty, topic: string) => {
+      updateSession(id, { faculty, topic });
+    },
+    [updateSession]
+  );
 
-  function updateStageDraft(id: string, stage: LifecycleStage, content: string) {
-    mutate((prev) => {
-      const session = prev.sessions[id];
-      if (!session) return prev;
-      const updated: LabSession = {
-        ...session,
-        stages: { ...session.stages, [stage]: { ...session.stages[stage], draftContent: content } },
-        updatedAt: new Date().toISOString(),
-      };
-      return { ...prev, sessions: { ...prev.sessions, [id]: updated } };
-    });
-  }
+  const updateStageDraft = useCallback(
+    (id: string, stage: LifecycleStage, content: string) => {
+      mutate((prev) => {
+        const session = prev.sessions[id];
+        if (!session) return prev;
+        const updated: LabSession = {
+          ...session,
+          stages: { ...session.stages, [stage]: { ...session.stages[stage], draftContent: content } },
+          updatedAt: new Date().toISOString(),
+        };
+        return { ...prev, sessions: { ...prev.sessions, [id]: updated } };
+      });
+    },
+    [mutate]
+  );
 
-  function appendStageMessages(id: string, stage: LifecycleStage, newMessages: StageMessage[]) {
-    mutate((prev) => {
-      const session = prev.sessions[id];
-      if (!session) return prev;
-      const stageRecord = session.stages[stage];
-      const updated: LabSession = {
-        ...session,
-        stages: {
+  const appendStageMessages = useCallback(
+    (id: string, stage: LifecycleStage, newMessages: StageMessage[]) => {
+      mutate((prev) => {
+        const session = prev.sessions[id];
+        if (!session) return prev;
+        const stageRecord = session.stages[stage];
+        const updated: LabSession = {
+          ...session,
+          stages: {
+            ...session.stages,
+            [stage]: { ...stageRecord, messages: [...stageRecord.messages, ...newMessages] },
+          },
+          updatedAt: new Date().toISOString(),
+        };
+        return { ...prev, sessions: { ...prev.sessions, [id]: updated } };
+      });
+    },
+    [mutate]
+  );
+
+  const completeStage = useCallback(
+    (id: string, stage: LifecycleStage) => {
+      mutate((prev) => {
+        const session = prev.sessions[id];
+        if (!session) return prev;
+        const stageIndex = LIFECYCLE_STAGES.indexOf(stage);
+        const nextStage = LIFECYCLE_STAGES[stageIndex + 1];
+
+        const stages = {
           ...session.stages,
-          [stage]: { ...stageRecord, messages: [...stageRecord.messages, ...newMessages] },
-        },
-        updatedAt: new Date().toISOString(),
-      };
-      return { ...prev, sessions: { ...prev.sessions, [id]: updated } };
-    });
-  }
+          [stage]: { ...session.stages[stage], status: "complete" as const, completedAt: new Date().toISOString() },
+        };
+        if (nextStage) {
+          stages[nextStage] = { ...stages[nextStage], status: "in_progress" as const };
+        }
 
-  function completeStage(id: string, stage: LifecycleStage) {
-    mutate((prev) => {
-      const session = prev.sessions[id];
-      if (!session) return prev;
-      const stageIndex = LIFECYCLE_STAGES.indexOf(stage);
-      const nextStage = LIFECYCLE_STAGES[stageIndex + 1];
+        const updated: LabSession = {
+          ...session,
+          stages,
+          status: !nextStage ? "ready_for_review" : session.status,
+          updatedAt: new Date().toISOString(),
+        };
+        return { ...prev, sessions: { ...prev.sessions, [id]: updated } };
+      });
+    },
+    [mutate]
+  );
 
-      const stages = {
-        ...session.stages,
-        [stage]: { ...session.stages[stage], status: "complete" as const, completedAt: new Date().toISOString() },
-      };
-      if (nextStage) {
-        stages[nextStage] = { ...stages[nextStage], status: "in_progress" as const };
-      }
-
-      const updated: LabSession = {
-        ...session,
-        stages,
-        status: !nextStage ? "ready_for_review" : session.status,
-        updatedAt: new Date().toISOString(),
-      };
-      return { ...prev, sessions: { ...prev.sessions, [id]: updated } };
-    });
-  }
+  const setActiveSessionId = useCallback(
+    (id: string) => mutate((prev) => ({ ...prev, activeSessionId: id })),
+    [mutate]
+  );
 
   return {
     hydrated,
     sessions: store.sessions,
     activeSession,
     startNewSession,
-    setActiveSessionId: (id: string) => mutate((prev) => ({ ...prev, activeSessionId: id })),
+    setActiveSessionId,
     recordExamResult,
     assignFaculty,
     updateStageDraft,
