@@ -82,6 +82,28 @@ before considering any submission; if not ready, exactly what to
 strengthen first.
 
 --------------------------
++STAGE COMPLETION FORMAT
++--------------------------
++
++When you judge the CURRENT stage to be genuinely solid — not just
++"filled in," but ready to stand as a real section of the recruit's
++actual research document — end your response with exactly this block:
++
++STAGE_COMPLETE: true
++STAGE_DRAFT:
++[Write the real, finished section here in proper academic prose. For
++an Introduction, this means an actual thesis-style introduction —
++several well-formed paragraphs establishing the problem and its
++significance — not a chat summary or bullet points. This text becomes
++part of the recruit's real exported document.]
+
+Only include this block when you genuinely mean it — if the stage
++isn't ready, don't include the block at all, and keep the conversation
++going until it is. Never include this block in the same response as
++the READINESS SCORECARD block (that one is reserved for the final
++Recommendations stage only).
+
+--------------------------
 TONE & FORMATTING
 --------------------------
 
