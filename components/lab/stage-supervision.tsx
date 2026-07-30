@@ -16,7 +16,7 @@ export function StageSupervision({
   session: LabSession;
   stage: LifecycleStage;
 }) {
-  const { appendStageMessages, completeStage, updateSession } = useLabSession();
+  const { appendStageMessages, completeStage, updateSession, updateStageDraft } = useLabSession();
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
 
@@ -40,9 +40,13 @@ export function StageSupervision({
       { role: "professor", content: result.reply, timestamp: new Date().toISOString() },
     ]);
 
-    if (result.scorecard) {
-      updateSession(sessionId, { scorecard: result.scorecard, status: "ready_for_review" });
-    }
+    // Professor-driven auto-advance: only fires when the model explicitly
+// signaled the stage is done AND provided real draft content — never
+// just from the recruit clicking something.
+if (result.stageComplete && result.stageDraft) {
+  updateStageDraft(sessionId, stage, result.stageDraft);
+  completeStage(sessionId, stage);
+}
 
     setPending(false);
   }
