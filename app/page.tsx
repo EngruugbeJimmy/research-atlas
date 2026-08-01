@@ -43,8 +43,8 @@ const workflow = [
 const heroStats = [
   { icon: Compass, value: "13", label: "Research Missions" },
   { icon: BookOpen, value: "70", label: "Interactive Lessons" },
+  { icon: LineChart, value: "14", label: "Interactive Simulations" },
   { icon: Sparkles, value: "100%", label: "Free & Open Source" },
-  { icon: Sparkles, value: "∞", label: "Endless Possibilities" },
 ];
 
 const heroLearningAreas = [
