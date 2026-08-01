@@ -8,11 +8,11 @@ import { useProgress } from "@/hooks/use-progress";
 import { missions } from "@/lib/missions/data";
 
 const navLinks = [
-  { href: "/missions", label: "Missions" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/profile", label: "Profile" },
-  { href: "/curriculum", label: "Curriculum" },
+  { href: "/missions", label: "Career Tracks" },
   { href: "/simulations", label: "Simulations" },
+  { href: "/lab", label: "Research Lab" },
+  { href: "/dashboard", label: "My Progress" },
+  { href: "/profile", label: "Portfolio" },
   { href: "/about", label: "About" },
 ];
 
