@@ -24,6 +24,7 @@ import { FaqAccordion } from "@/components/ui/faq-accordion";
 import { Reveal } from "@/components/ui/reveal";
 import { HeroBackground } from "@/components/home/hero-background";
 import { domains } from "@/lib/domains/data";
+import { DomainGrid } from "@/components/home/domain-grid";
 
 const domainIcons: Record<string, typeof Droplets> = {
   "environmental-science": Droplets,
@@ -216,6 +217,7 @@ export default function HomePage() {
       </section>
 
       {/* RESEARCH DOMAINS */}
+      <DomainGrid />
       <section className="border-b border-basin-500/15 py-20">
         <div className="mx-auto max-w-6xl px-4 md:px-8">
           <Reveal>
