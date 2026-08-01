@@ -2,7 +2,7 @@
 
 **Learn Research Like a Scientist.**
 
-Research Atlas is a free, open-source interactive learning platform that takes complete beginners from zero knowledge to publishing environmental research — using statistics, GIS, machine learning, AI, and scientific modelling — through one continuous investigation of the **Bluewater Basin** watershed.
+Research Atlas is a free, open-source interactive learning platform that takes complete beginners from zero knowledge to publishing environmental research  using statistics, GIS, machine learning, AI, and scientific modelling through one continuous investigation of the **Bluewater Basin** watershed.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
