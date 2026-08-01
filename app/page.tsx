@@ -23,7 +23,6 @@ import { HeroCta } from "@/components/missions/hero-cta";
 import { FaqAccordion } from "@/components/ui/faq-accordion";
 import { Reveal } from "@/components/ui/reveal";
 import { HeroBackground } from "@/components/home/hero-background";
-import { domains } from "@/lib/domains/data";
 import { DomainGrid } from "@/components/home/domain-grid";
 
 const domainIcons: Record<string, typeof Droplets> = {
@@ -220,6 +219,7 @@ export default function HomePage() {
       <section className="border-b border-basin-500/15 py-20">
         <div className="mx-auto max-w-6xl px-4 md:px-8">
           <Reveal>
+             <DomainGrid />
             <p className="type-eyebrow">One platform, many fields</p>
             <h2 className="mt-2 text-3xl font-medium md:text-4xl">
               Research Atlas isn&apos;t just environmental science.
