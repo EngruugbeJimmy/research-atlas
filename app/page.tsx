@@ -25,6 +25,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { HeroBackground } from "@/components/home/hero-background";
 import { DomainGrid } from "@/components/home/domain-grid";
 import { HeroScientificGrid } from "@/components/home/hero-scientific-grid";
+import { domains } from "@/lib/domains/data";
 
 const domainIcons: Record<string, typeof Droplets> = {
   "environmental-science": Droplets,
