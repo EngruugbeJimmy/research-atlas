@@ -24,6 +24,7 @@ import { FaqAccordion } from "@/components/ui/faq-accordion";
 import { Reveal } from "@/components/ui/reveal";
 import { HeroBackground } from "@/components/home/hero-background";
 import { DomainGrid } from "@/components/home/domain-grid";
+import { HeroScientificGrid } from "@/components/home/hero-scientific-grid";
 
 const domainIcons: Record<string, typeof Droplets> = {
   "environmental-science": Droplets,
@@ -143,77 +144,59 @@ export default function HomePage() {
   return (
     <>
       {/* HERO */}
-      <section className="relative overflow-hidden border-b border-basin-500/15 text-paper">
-        <HeroBackground />
+<section className="relative overflow-hidden border-b border-ink/10 dark:border-paper/10">
+  <HeroBackground />
 
-        <Reveal className="relative mx-auto max-w-6xl px-4 pb-20 pt-8 sm:pt-10 md:px-8 md:pb-24 md:pt-12 lg:pt-16">
-          <div className="max-w-2xl">
-            <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-paper/25 bg-ink/30 px-3 py-1 font-mono text-xs uppercase tracking-[0.18em] text-paper/90 backdrop-blur-sm">
-  <MapIcon className="h-3.5 w-3.5" /> Learn · Code · Simulate · Discover
-</p>
-<h1 className="text-4xl font-medium leading-tight tracking-tight text-paper md:text-6xl">
-  Become a
-  <br />
-  <span className="text-basin-300">Computational Scientist.</span>
-</h1>
-<p className="mt-6 max-w-xl text-lg text-paper/80">
-  Learn Python, GIS, statistics, and machine learning through real research missions —
-  starting with Bluewater Basin, our first fully built Environmental Science track,
-  with more scientific disciplines on the way.
-</p>
-            <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-              <HeroCta />
-              <Link
-                href="/missions"
-                className="rounded-full border border-paper/30 px-6 py-3 font-medium text-paper transition hover:-translate-y-0.5 hover:border-paper/60 hover:bg-paper/10 hover:shadow-md hover:shadow-ink/20"
-              >
-                Explore Missions
-              </Link>
-              <Link
-                href="/simulations/watershed-explorer"
-                className="flex items-center gap-2 px-6 py-3 font-medium text-paper/75 transition hover:text-paper"
-              >
-                <PlayCircle className="h-4 w-4" /> Interactive Demo
-              </Link>
-            </div>
-          </div>
+  <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-20 pt-10 sm:pt-14 md:px-8 md:pb-24 lg:grid-cols-[1fr_1.3fr] lg:items-center lg:gap-8 lg:pt-16">
+    {/* LEFT — content */}
+    <Reveal className="max-w-xl">
+      <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-ink/15 bg-paper px-3 py-1 font-mono text-xs uppercase tracking-[0.18em] text-ink/70 dark:border-paper/15 dark:bg-ink-800 dark:text-paper/70">
+        <MapIcon className="h-3.5 w-3.5" /> Learn · Code · Simulate · Discover
+      </p>
+      <h1 className="text-4xl font-medium leading-tight tracking-tight text-ink dark:text-paper md:text-6xl">
+        Become a
+        <br />
+        <span className="text-basin-500">Computational Scientist.</span>
+      </h1>
+      <p className="mt-6 max-w-lg text-lg text-ink/70 dark:text-paper/70">
+        Learn Python, GIS, statistics, and machine learning through real research missions —
+        starting with Bluewater Basin, our first fully built Environmental Science track,
+        with more scientific disciplines on the way.
+      </p>
 
-          {/* Stats */}
-          <div className="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-            {heroStats.map((s) => (
-              <div
-                key={s.label}
-                className="rounded-xl border border-paper/15 bg-ink/25 p-4 backdrop-blur-sm"
-              >
-                <s.icon className="h-4 w-4 text-basin-300" strokeWidth={1.75} />
-                <p className="mt-2 font-display text-2xl text-paper">{s.value}</p>
-                <p className="mt-0.5 text-xs text-paper/65">{s.label}</p>
-              </div>
-            ))}
-          </div>
+      <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+        <HeroCta />
+        <Link
+          href="/missions"
+          className="rounded-full border border-ink/20 px-6 py-3 font-medium text-ink transition hover:-translate-y-0.5 hover:border-basin-500/50 hover:bg-basin-500/5 dark:border-paper/20 dark:text-paper"
+        >
+          Explore Missions
+        </Link>
+      </div>
 
-          {/* Learning areas */}
-          <p className="mt-6 font-mono text-[11px] uppercase tracking-wide text-paper/50">
-            What you&apos;ll practice in Bluewater Basin
-          </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {heroLearningAreas.map((area) => (
-              <Link
-                key={area.title}
-                href={area.href}
-                className="group rounded-xl border border-paper/15 bg-ink/25 p-4 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-paper/35 hover:bg-ink/35"
-              >
-                <area.icon className="h-4 w-4 text-basin-300" strokeWidth={1.75} />
-                <h3 className="mt-2 text-sm font-medium text-paper">{area.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-paper/65">{area.description}</p>
-                <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-basin-300 opacity-0 transition-opacity group-hover:opacity-100">
-                  Explore <ArrowRight className="h-3 w-3" />
-                </span>
-              </Link>
-            ))}
-          </div>
-        </Reveal>
-      </section>
+      <Link
+        href="/simulations/watershed-explorer"
+        className="mt-4 flex items-center gap-2 text-sm font-medium text-ink/60 transition hover:text-basin-500 dark:text-paper/60"
+      >
+        <PlayCircle className="h-4 w-4" /> Try an interactive demo
+      </Link>
+
+      {/* Real numbers instead of a stats card grid */}
+      <div className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-ink/10 pt-6 text-sm text-ink/60 dark:border-paper/10 dark:text-paper/60">
+        {heroStats.map((s) => (
+          <span key={s.label}>
+            <strong className="text-ink dark:text-paper">{s.value}</strong> {s.label}
+          </span>
+        ))}
+      </div>
+    </Reveal>
+
+    {/* RIGHT — scientific computing grid */}
+    <div className="lg:pl-4">
+      <HeroScientificGrid />
+    </div>
+  </div>
+</section>
 
       {/* RESEARCH DOMAINS */}
       <section className="border-b border-basin-500/15 py-20">
